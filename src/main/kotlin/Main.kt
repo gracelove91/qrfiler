@@ -16,6 +16,12 @@ import java.awt.dnd.DropTarget
 import java.awt.dnd.DropTargetDropEvent
 import java.io.File
 import javax.swing.JFileChooser
+import java.net.InetAddress
+import java.net.NetworkInterface
+import com.sun.net.httpserver.HttpServer
+import com.sun.net.httpserver.HttpHandler
+import com.sun.net.httpserver.HttpExchange
+import java.net.InetSocketAddress
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "qrfiler") {
@@ -82,6 +88,30 @@ fun App(window: ComposeWindow) {
         selectedPath?.let { path ->
             Spacer(modifier = Modifier.height(16.dp))
             Text("선택된 경로: $path", style = MaterialTheme.typography.body2, color = Color(0xFF4FC3F7))
+            Text("http://${getLocalIpAddress()}:8080/$path", style = MaterialTheme.typography.body2, color = Color(0xFF4FC3F7))
         }
     }
+}
+
+fun getLocalIpAddress(): String {
+    val interfaces = NetworkInterface.getNetworkInterfaces().toList()
+    for (iface in interfaces) {
+        if(!iface.isUp || iface.isLoopback || iface.isVirtual) {
+            continue
+        }
+
+        val name = iface.name.lowercase()
+
+        if (name.contains("en") || name.contains("wi-fi") || name.contains("wlan")) {
+            for (addr in iface.inetAddresses.toList()) {
+                if (!addr.isLoopbackAddress && addr is InetAddress) {
+                    val host = addr.hostAddress
+                    if (host.contains(".")) {
+                        return host // IPv4
+                    }
+                }
+            }
+        }
+    }
+    return "127.0.0.1"
 }
