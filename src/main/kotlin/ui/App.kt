@@ -90,7 +90,7 @@ fun App(window: ComposeWindow) {
         selectedPath?.let { path ->
             Spacer(modifier = Modifier.height(16.dp))
             Text("선택된 경로: $path", style = MaterialTheme.typography.body2, color = Color(0xFF4FC3F7))
-            Text("http://${getLocalIpAddress()}:8080/$path", style = MaterialTheme.typography.body2, color = Color(0xFF4FC3F7))
+            Text("http://${getLocalIpAddress()}:8080$path", style = MaterialTheme.typography.body2, color = Color(0xFF4FC3F7))
         }
     }
 }
