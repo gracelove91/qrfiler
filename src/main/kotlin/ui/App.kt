@@ -1,16 +1,8 @@
 package ui
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
@@ -33,15 +25,16 @@ import java.awt.dnd.DropTarget
 import java.awt.dnd.DropTargetDropEvent
 import java.io.File
 import javax.swing.JFileChooser
-import network.getLocalIpAddress
 import network.startFileServer
 
 @Composable
-@Preview
 fun App(window: ComposeWindow) {
     var selectedPath by remember { mutableStateOf<String?>(null) }
-    var server by remember { mutableStateOf<HttpServer?>(null) }
-    var shareUrl by remember { mutableStateOf<String?>(null) }
+    var isSharing by remember { mutableStateOf(false) }
+    var shareUrl by remember { mutableStateOf("") }
+
+    // HttpServer는 Compose 상태로 관리하면 unstable로 인식될 수 있으므로 외부에 둔다
+    val serverRef = remember { arrayOf<HttpServer?>(null) }
 
     // 드래그앤드롭 (ComposeWindow에 Swing DropTarget 붙이기)
     LaunchedEffect(Unit) {
@@ -97,12 +90,13 @@ fun App(window: ComposeWindow) {
             Text("선택된 경로: $path", style = MaterialTheme.typography.body2, color = Color(0xFF4FC3F7))
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (server == null) {
+            if (!isSharing) {
                 Button(
                     onClick = {
                         val file = File(path)
                         val (s, url) = startFileServer(file)
-                        server = s
+                        serverRef[0] = s
+                        isSharing = true
                         shareUrl = url
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2E7D32))
@@ -112,9 +106,10 @@ fun App(window: ComposeWindow) {
             } else {
                 Button(
                     onClick = {
-                        server?.stop(0)
-                        server = null
-                        shareUrl = null
+                        serverRef[0]?.stop(0)
+                        serverRef[0] = null
+                        isSharing = false
+                        shareUrl = ""
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFC62828))
                 ) {
@@ -123,10 +118,11 @@ fun App(window: ComposeWindow) {
             }
         }
 
-        shareUrl?.let {url ->
+        // 공유 URL 표시
+        if (shareUrl.isNotEmpty()) {
             Spacer(modifier = Modifier.height(24.dp))
             Text("다운로드 URL:", style = MaterialTheme.typography.body1, color = Color(0xFF81C784))
-            Text(url, style = MaterialTheme.typography.h6, color = Color(0xFF4FC3F7))
+            Text(shareUrl, style = MaterialTheme.typography.h6, color = Color(0xFF4FC3F7))
             Text("같은 Wi-Fi 내 다른 기기에서 위 URL로 접속하세요", style = MaterialTheme.typography.caption, color = Color.Gray)
         }
     }

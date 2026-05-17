@@ -4,10 +4,14 @@ import com.sun.net.httpserver.HttpServer
 import java.io.File
 import java.net.InetSocketAddress
 
+private fun generateToken(length: Int = 8) : String =
+    (1..length).map { "0123456789abcdef".random() }.joinToString("")
+
 fun startFileServer(file: File, port: Int = 0): Pair<HttpServer, String> {
+    val token = generateToken()
     val server = HttpServer.create(InetSocketAddress(port), 0)
 
-    server.createContext("/download") { exchange ->
+    server.createContext("/$token") { exchange ->
         val headers = exchange.responseHeaders
         headers.add("Content-Type", "application/octet-stream")
         headers.add("Content-Disposition", "attachment; filename=\"${file.name}\"")
@@ -27,5 +31,5 @@ fun startFileServer(file: File, port: Int = 0): Pair<HttpServer, String> {
 
     val actualPort = server.address.port
     val ip = getLocalIpAddress()
-    return server to "http:$ip:$actualPort/download"
+    return server to "http://$ip:$actualPort/$token"
 }
