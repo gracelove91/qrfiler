@@ -3,6 +3,8 @@ package ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
@@ -33,27 +35,24 @@ fun App(window: ComposeWindow) {
     var isSharing by remember { mutableStateOf(false) }
     var shareUrl by remember { mutableStateOf("") }
 
-    // HttpServer는 Compose 상태로 관리하면 unstable로 인식될 수 있으므로 외부에 둔다
-    val serverRef = remember { arrayOf<HttpServer?>(null) }
+    val serverHolder = remember { object { var server: HttpServer? = null } }
 
-    // 드래그앤드롭 (ComposeWindow에 Swing DropTarget 붙이기)
     LaunchedEffect(Unit) {
         window.contentPane.dropTarget = object : DropTarget() {
             override fun drop(dtde: DropTargetDropEvent) {
                 dtde.acceptDrop(DnDConstants.ACTION_COPY)
-                val files = dtde.transferable.getTransferData(
-                    DataFlavor.javaFileListFlavor
-                ) as List<*>
-                files.firstOrNull()?.let {
-                    selectedPath = (it as File).absolutePath
-                }
+                val files = dtde.transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
+                files.firstOrNull()?.let { selectedPath = (it as File).absolutePath }
                 dtde.dropComplete(true)
             }
         }
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(32.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -61,9 +60,9 @@ fun App(window: ComposeWindow) {
         Spacer(modifier = Modifier.height(8.dp))
         Text("파일이나 폴더를 드래그하거나 버튼을 클릭하세요", style = MaterialTheme.typography.body1)
 
-        // 드래그 영역 시각적 표시
         Box(
-            modifier = Modifier.padding(vertical = 24.dp)
+            modifier = Modifier
+                .padding(vertical = 24.dp)
                 .size(200.dp)
                 .border(2.dp, color = Color.Gray, shape = MaterialTheme.shapes.medium)
                 .background(Color(0xFF1E2A3A)),
@@ -72,19 +71,17 @@ fun App(window: ComposeWindow) {
             Text("📁", style = MaterialTheme.typography.h2)
         }
 
-        // 파일 선택 버튼
         Button(onClick = {
             val chooser = JFileChooser().apply {
                 fileSelectionMode = JFileChooser.FILES_AND_DIRECTORIES
             }
-            if(chooser.showOpenDialog(window) == JFileChooser.APPROVE_OPTION) {
+            if (chooser.showOpenDialog(window) == JFileChooser.APPROVE_OPTION) {
                 selectedPath = chooser.selectedFile.absolutePath
             }
         }) {
             Text("파일/폴더 선택")
         }
 
-        // 선택된 경로 표시
         selectedPath?.let { path ->
             Spacer(modifier = Modifier.height(16.dp))
             Text("선택된 경로: $path", style = MaterialTheme.typography.body2, color = Color(0xFF4FC3F7))
@@ -95,7 +92,7 @@ fun App(window: ComposeWindow) {
                     onClick = {
                         val file = File(path)
                         val (s, url) = startFileServer(file)
-                        serverRef[0] = s
+                        serverHolder.server = s
                         isSharing = true
                         shareUrl = url
                     },
@@ -106,8 +103,8 @@ fun App(window: ComposeWindow) {
             } else {
                 Button(
                     onClick = {
-                        serverRef[0]?.stop(0)
-                        serverRef[0] = null
+                        serverHolder.server?.stop(0)
+                        serverHolder.server = null
                         isSharing = false
                         shareUrl = ""
                     },
@@ -118,7 +115,6 @@ fun App(window: ComposeWindow) {
             }
         }
 
-        // 공유 URL 표시
         if (shareUrl.isNotEmpty()) {
             Spacer(modifier = Modifier.height(24.dp))
             Text("다운로드 URL:", style = MaterialTheme.typography.body1, color = Color(0xFF81C784))
