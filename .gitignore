@@ -1,0 +1,12 @@
+.gradle/
+build/
+*.class
+*.log
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+*.war
+*.ear
+*.iml
+.idea/
+.DS_Store
+Thumbs.db
