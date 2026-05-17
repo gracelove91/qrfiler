@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.sun.net.httpserver.HttpServer
 import java.awt.datatransfer.DataFlavor
 import java.awt.dnd.DnDConstants
 import java.awt.dnd.DropTarget
@@ -32,11 +34,14 @@ import java.awt.dnd.DropTargetDropEvent
 import java.io.File
 import javax.swing.JFileChooser
 import network.getLocalIpAddress
+import network.startFileServer
 
 @Composable
 @Preview
 fun App(window: ComposeWindow) {
     var selectedPath by remember { mutableStateOf<String?>(null) }
+    var server by remember { mutableStateOf<HttpServer?>(null) }
+    var shareUrl by remember { mutableStateOf<String?>(null) }
 
     // 드래그앤드롭 (ComposeWindow에 Swing DropTarget 붙이기)
     LaunchedEffect(Unit) {
@@ -90,7 +95,39 @@ fun App(window: ComposeWindow) {
         selectedPath?.let { path ->
             Spacer(modifier = Modifier.height(16.dp))
             Text("선택된 경로: $path", style = MaterialTheme.typography.body2, color = Color(0xFF4FC3F7))
-            Text("http://${getLocalIpAddress()}:8080$path", style = MaterialTheme.typography.body2, color = Color(0xFF4FC3F7))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (server == null) {
+                Button(
+                    onClick = {
+                        val file = File(path)
+                        val (s, url) = startFileServer(file)
+                        server = s
+                        shareUrl = url
+                    },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2E7D32))
+                ) {
+                    Text("공유 시작")
+                }
+            } else {
+                Button(
+                    onClick = {
+                        server?.stop(0)
+                        server = null
+                        shareUrl = null
+                    },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFC62828))
+                ) {
+                    Text("공유 중지")
+                }
+            }
+        }
+
+        shareUrl?.let {url ->
+            Spacer(modifier = Modifier.height(24.dp))
+            Text("다운로드 URL:", style = MaterialTheme.typography.body1, color = Color(0xFF81C784))
+            Text(url, style = MaterialTheme.typography.h6, color = Color(0xFF4FC3F7))
+            Text("같은 Wi-Fi 내 다른 기기에서 위 URL로 접속하세요", style = MaterialTheme.typography.caption, color = Color.Gray)
         }
     }
 }
