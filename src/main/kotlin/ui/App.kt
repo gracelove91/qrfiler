@@ -28,6 +28,7 @@ import java.awt.dnd.DropTargetDropEvent
 import java.io.File
 import javax.swing.JFileChooser
 import network.startFileServer
+import ui.QrCodeImage
 
 @Composable
 fun App(window: ComposeWindow) {
@@ -120,6 +121,10 @@ fun App(window: ComposeWindow) {
             Text("다운로드 URL:", style = MaterialTheme.typography.body1, color = Color(0xFF81C784))
             Text(shareUrl, style = MaterialTheme.typography.h6, color = Color(0xFF4FC3F7))
             Text("같은 Wi-Fi 내 다른 기기에서 위 URL로 접속하세요", style = MaterialTheme.typography.caption, color = Color.Gray)
+            Spacer(modifier = Modifier.height(16.dp))
+            QrCodeImage(url = shareUrl, size = 200)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("또는 카메라로 QR 코드를 스캔하세요", style = MaterialTheme.typography.caption, color = Color.Gray)
         }
     }
 }
