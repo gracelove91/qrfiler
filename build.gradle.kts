@@ -28,6 +28,10 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "qrfiler"
             packageVersion = "1.0.0"
+
+            macOS {
+                iconFile.set(file("src/main/resources/qrfiler.icns"))
+            }
         }
     }
 }
