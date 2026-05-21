@@ -3,13 +3,15 @@ package network
 import java.net.InetAddress
 import java.net.NetworkInterface
 
-
 fun getLocalIpAddress(): String {
     val interfaces = NetworkInterface.getNetworkInterfaces().toList()
     for (iface in interfaces) {
         if (!iface.isUp || iface.isLoopback || iface.isVirtual) {
             continue
         }
+
+        val displayName = iface.displayName.lowercase()
+        if (displayName.contains("vpn")) continue
 
         val name = iface.name.lowercase()
 
