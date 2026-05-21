@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
+import org.jetbrains.skia.Color as SkiaColor
 import org.jetbrains.skia.Bitmap
 
 @Composable
@@ -23,7 +24,7 @@ fun QrCodeImage(url: String, size: Int = 200) {
             val pixels = IntArray(size * size) { index ->
                 val x = index % size
                 val y = index / size
-                if (bitMatrix.get(x, y)) Color.Black.value.toInt() else Color.White.value.toInt()
+                if (bitMatrix.get(x, y)) SkiaColor.BLACK else SkiaColor.WHITE
             }
             installPixels(pixels)
         }
