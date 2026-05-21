@@ -82,7 +82,7 @@ fun App(window: ComposeWindow) {
 
         Button(onClick = {
             val chooser = JFileChooser().apply {
-                fileSelectionMode = JFileChooser.FILES_AND_DIRECTORIES
+                fileSelectionMode = JFileChooser.FILES_ONLY
             }
             if (chooser.showOpenDialog(window) == JFileChooser.APPROVE_OPTION) {
                 selectedPath = chooser.selectedFile.absolutePath
