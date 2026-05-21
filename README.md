@@ -13,11 +13,11 @@ Kotlin + Compose Desktop 기반 로컬 파일 공유 앱. 파일이나 폴더를
 
 ## macOS Gatekeeper — First Launch
 
-This app is ad-hoc signed only (no Apple Developer ID notarization). Because you downloaded it from the internet, macOS may show:
+This app is ad-hoc signed only (no Apple Developer ID notarization). macOS may show:
 
 > "Apple cannot check it for malicious software."
 
-**Workaround**: Right-click the app → **Open** instead of double-click.
+**Recommended**: Right-click `qrfiler.app` → **Open** (do not double-click). Click "Open" on the dialog. This only needs to be done once.
 
 Or remove quarantine via Terminal:
 
@@ -26,6 +26,15 @@ xattr -dr com.apple.quarantine /path/to/qrfiler.app
 ```
 
 If needed, also allow in **System Settings → Privacy & Security**.
+
+## Homebrew Cask (TBD)
+
+```bash
+brew tap gracelove91/tap
+brew install --cask qrfiler
+```
+
+> Planned — PR to homebrew/homebrew-cask will be submitted once download stats justify it. Until then, use the GitHub release.
 
 ## Development
 
