@@ -70,14 +70,21 @@ fun App(window: ComposeWindow) {
     ) {
         Text("qrfiler", style = MaterialTheme.typography.h3)
         Spacer(modifier = Modifier.height(8.dp))
-        Text("파일이나 폴더를 드래그하거나 버튼을 클릭하세요", style = MaterialTheme.typography.body1)
+        Text(
+            "파일을 드래그하거나 버튼을 클릭하세요",
+            style = MaterialTheme.typography.body1
+        )
 
         Box(
             modifier = Modifier
                 .padding(vertical = 24.dp)
                 .size(200.dp)
-                .border(2.dp, color = Color.Gray, shape = MaterialTheme.shapes.medium)
-                .background(Color(0xFF1E2A3A)),
+                .border(
+                    2.dp,
+                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.3f),
+                    shape = MaterialTheme.shapes.medium
+                )
+                .background(MaterialTheme.colors.surface),
             contentAlignment = Alignment.Center
         ) {
             Text("📁", style = MaterialTheme.typography.h2)
@@ -91,12 +98,16 @@ fun App(window: ComposeWindow) {
                 selectedPath = chooser.selectedFile.absolutePath
             }
         }) {
-            Text("파일/폴더 선택")
+            Text("파일 선택")
         }
 
         selectedPath?.let { path ->
             Spacer(modifier = Modifier.height(16.dp))
-            Text("선택된 경로: $path", style = MaterialTheme.typography.body2, color = Color(0xFF4FC3F7))
+            Text(
+                "선택된 경로: $path",
+                style = MaterialTheme.typography.body2,
+                color = MaterialTheme.colors.primary
+            )
             Spacer(modifier = Modifier.height(16.dp))
 
             if (!isSharing) {
@@ -107,7 +118,9 @@ fun App(window: ComposeWindow) {
                         server = s
                         shareUrl = url
                     },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2E7D32))
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = MaterialTheme.colors.secondary
+                    )
                 ) {
                     Text("공유 시작")
                 }
@@ -118,7 +131,9 @@ fun App(window: ComposeWindow) {
                         server = null
                         shareUrl = ""
                     },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFC62828))
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = MaterialTheme.colors.error
+                    )
                 ) {
                     Text("공유 중지")
                 }
@@ -127,13 +142,29 @@ fun App(window: ComposeWindow) {
 
         if (shareUrl.isNotEmpty()) {
             Spacer(modifier = Modifier.height(24.dp))
-            Text("다운로드 URL:", style = MaterialTheme.typography.body1, color = Color(0xFF81C784))
-            Text(shareUrl, style = MaterialTheme.typography.h6, color = Color(0xFF4FC3F7))
-            Text("같은 Wi-Fi 내 다른 기기에서 위 URL로 접속하세요", style = MaterialTheme.typography.caption, color = Color.Gray)
+            Text(
+                "다운로드 URL:",
+                style = MaterialTheme.typography.body1,
+                color = MaterialTheme.colors.secondary
+            )
+            Text(
+                shareUrl,
+                style = MaterialTheme.typography.h6,
+                color = MaterialTheme.colors.primary
+            )
+            Text(
+                "같은 Wi-Fi 내 다른 기기에서 위 URL로 접속하세요",
+                style = MaterialTheme.typography.caption,
+                color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
+            )
             Spacer(modifier = Modifier.height(16.dp))
             QrCodeImage(url = shareUrl, size = 200)
             Spacer(modifier = Modifier.height(8.dp))
-            Text("또는 카메라로 QR 코드를 스캔하세요", style = MaterialTheme.typography.caption, color = Color.Gray)
+            Text(
+                "또는 카메라로 QR 코드를 스캔하세요",
+                style = MaterialTheme.typography.caption,
+                color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
+            )
         }
     }
 }
