@@ -10,6 +10,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,10 +34,17 @@ import ui.QrCodeImage
 @Composable
 fun App(window: ComposeWindow) {
     var selectedPath by remember { mutableStateOf<String?>(null) }
-    var isSharing by remember { mutableStateOf(false) }
+    var server by remember { mutableStateOf<HttpServer?>(null) }
     var shareUrl by remember { mutableStateOf("") }
+    val isSharing = server != null
 
-    val serverHolder = remember { object { var server: HttpServer? = null } }
+    DisposableEffect(selectedPath) {
+        onDispose {
+            server?.stop(0)
+            server = null
+            shareUrl = ""
+        }
+    }
 
     LaunchedEffect(Unit) {
         window.contentPane.dropTarget = object : DropTarget() {
@@ -93,8 +101,7 @@ fun App(window: ComposeWindow) {
                     onClick = {
                         val file = File(path)
                         val (s, url) = startFileServer(file)
-                        serverHolder.server = s
-                        isSharing = true
+                        server = s
                         shareUrl = url
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2E7D32))
@@ -104,9 +111,8 @@ fun App(window: ComposeWindow) {
             } else {
                 Button(
                     onClick = {
-                        serverHolder.server?.stop(0)
-                        serverHolder.server = null
-                        isSharing = false
+                        server?.stop(0)
+                        server = null
                         shareUrl = ""
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFC62828))
