@@ -14,6 +14,7 @@ private fun generateToken(length: Int = 16): String {
 }
 
 fun startFileServer(file: File, port: Int = 0): Pair<HttpServer, String> {
+    require(file.isFile) { "Only regular files are supported, not directories" }
     val token = generateToken()
     val server = HttpServer.create(InetSocketAddress(port), 0)
 
