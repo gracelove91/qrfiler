@@ -11,7 +11,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,7 +45,8 @@ fun App(window: ComposeWindow) {
         }
     }
 
-    LaunchedEffect(Unit) {
+    DisposableEffect(window) {
+        val oldDropTarget = window.contentPane.dropTarget
         window.contentPane.dropTarget = object : DropTarget() {
             override fun drop(dtde: DropTargetDropEvent) {
                 dtde.acceptDrop(DnDConstants.ACTION_COPY)
@@ -54,6 +54,9 @@ fun App(window: ComposeWindow) {
                 files.firstOrNull()?.let { selectedPath = (it as File).absolutePath }
                 dtde.dropComplete(true)
             }
+        }
+        onDispose {
+            window.contentPane.dropTarget = oldDropTarget
         }
     }
 
