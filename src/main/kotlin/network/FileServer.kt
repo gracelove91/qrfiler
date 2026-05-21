@@ -3,9 +3,15 @@ package network
 import com.sun.net.httpserver.HttpServer
 import java.io.File
 import java.net.InetSocketAddress
+import java.nio.file.Files
+import java.security.SecureRandom
+import java.util.concurrent.Executors
 
-private fun generateToken(length: Int = 8) : String =
-    (1..length).map { "0123456789abcdef".random() }.joinToString("")
+private fun generateToken(length: Int = 16): String {
+    val random = SecureRandom()
+    val chars = "0123456789abcdef"
+    return (1..length).map { chars[random.nextInt(chars.length)] }.joinToString("")
+}
 
 fun startFileServer(file: File, port: Int = 0): Pair<HttpServer, String> {
     val token = generateToken()
@@ -13,20 +19,28 @@ fun startFileServer(file: File, port: Int = 0): Pair<HttpServer, String> {
 
     server.createContext("/$token") { exchange ->
         val headers = exchange.responseHeaders
-        headers.add("Content-Type", "application/octet-stream")
-        headers.add("Content-Disposition", "attachment; filename=\"${file.name}\"")
+        val mime = Files.probeContentType(file.toPath()) ?: "application/octet-stream"
+        headers.add("Content-Type", mime)
+
+        val safeName = file.name.replace("\\", "").replace("\"", "")
+        headers.add("Content-Disposition", "attachment; filename=\"$safeName\"")
 
         exchange.sendResponseHeaders(200, file.length())
 
-        file.inputStream().use { input ->
-            exchange.responseBody.use { output ->
-                input.copyTo(output)
+        try {
+            file.inputStream().use { input ->
+                exchange.responseBody.use { output ->
+                    input.copyTo(output)
+                }
             }
+        } catch (e: Exception) {
+            exchange.sendResponseHeaders(500, -1)
+        } finally {
+            exchange.close()
         }
-        exchange.close()
     }
 
-    server.executor = null
+    server.executor = Executors.newFixedThreadPool(4)
     server.start()
 
     val actualPort = server.address.port
