@@ -5,27 +5,29 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
-import com.google.zxing.client.j2se.MatrixToImageWriter
-import org.jetbrains.skia.Image as SkiaImage
-import java.io.ByteArrayOutputStream
-import javax.imageio.ImageIO
+import org.jetbrains.skia.Bitmap
 
 @Composable
 fun QrCodeImage(url: String, size: Int = 200) {
     val imageBitmap = remember(url) {
         val writer = QRCodeWriter()
         val bitMatrix = writer.encode(url, BarcodeFormat.QR_CODE, size, size)
-        val bufferedImage = MatrixToImageWriter.toBufferedImage(bitMatrix)
 
-        val stream = ByteArrayOutputStream()
-        ImageIO.write(bufferedImage, "PNG", stream)
-        val pngBytes = stream.toByteArray()
-
-        SkiaImage.makeFromEncoded(pngBytes).asImageBitmap()
+        val bitmap = Bitmap().apply {
+            allocN32Pixels(size, size)
+            val pixels = IntArray(size * size) { index ->
+                val x = index % size
+                val y = index / size
+                if (bitMatrix.get(x, y)) Color.Black.value.toInt() else Color.White.value.toInt()
+            }
+            installPixels(pixels)
+        }
+        bitmap.asComposeImageBitmap()
     }
 
     Image(
