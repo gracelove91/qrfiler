@@ -32,7 +32,7 @@ fun QrCodeImage(url: String, size: Int = 200) {
 
     Image(
         bitmap = imageBitmap,
-        contentDescription = "QR Code for download URL",
+        contentDescription = "다운로드 URL용 QR 코드",
         modifier = Modifier.size(size.dp)
     )
 }
