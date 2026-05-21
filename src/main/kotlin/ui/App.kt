@@ -65,9 +65,9 @@ fun App(window: ComposeWindow) {
             .fillMaxSize()
             .padding(32.dp)
             .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.weight(1f))
         Text("qrfiler", style = MaterialTheme.typography.h3)
         Spacer(modifier = Modifier.height(8.dp))
         Text(
@@ -166,5 +166,6 @@ fun App(window: ComposeWindow) {
                 color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
             )
         }
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
