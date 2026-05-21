@@ -41,8 +41,10 @@ afterEvaluate {
         t.doLast {
             val app = file("build/compose/binaries/main/app/qrfiler.app")
             if (!app.exists()) return@doLast
+            val signScript = file("scripts/sign-app.sh")
+            if (!signScript.exists()) return@doLast
             exec {
-                commandLine("bash", file("scripts/sign-app.sh").absolutePath, app.absolutePath)
+                commandLine("bash", signScript.absolutePath, app.absolutePath)
             }
         }
     }
