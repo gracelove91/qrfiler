@@ -18,7 +18,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.sun.net.httpserver.HttpServer
 import java.awt.datatransfer.DataFlavor
