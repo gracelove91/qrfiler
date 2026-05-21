@@ -29,13 +29,26 @@ QRfiler is a minimal desktop app that turns file sharing into a single gesture: 
 
 ### macOS (Apple Silicon)
 
-Download the latest release from [Releases](../../releases), unzip, and run:
+#### Option 1: Homebrew (recommended)
 
 ```bash
-./qrfiler.app/Contents/MacOS/qrfiler
+brew tap gracelove91/tap
+brew install --cask qrfiler
+# Then remove quarantine so it opens without the security popup:
+sudo xattr -cr /Applications/qrfiler.app
 ```
 
-Or open `qrfiler.app` directly. (If Gatekeeper blocks it, right-click → Open.)
+#### Option 2: Download from [Releases](../../releases)
+
+1. Download `qrfiler-vX.X.X-macos-arm64.zip`
+2. Unzip and move `qrfiler.app` to `/Applications`
+3. Remove quarantine:
+   ```bash
+   xattr -cr /Applications/qrfiler.app
+   ```
+4. Launch from Launchpad or Spotlight
+
+> **Why `xattr -cr`?** The app is ad-hoc signed (no Apple Developer ID). macOS Gatekeeper blocks internet-downloaded unsigned apps by default. Removing the quarantine attribute is the only way to avoid the "malicious software" popup without a $99/year Apple Developer account.
 
 ### Build from source
 
@@ -93,6 +106,38 @@ QRfiler는 같은 Wi-Fi 내에서 파일을 QR 코드로 빠르게 공유하는 
 - QR 코드 생성으로 휴대폰에서 즉시 다운로드
 - 랜덤 hex 토큰 URL로 보안 강화 (예: `http://192.168.0.5:52341/a3f9b2e1`)
 - 외부 서버 없이 로컬 네트워크에서만 동작
+
+## 설치
+
+### macOS (Apple Silicon)
+
+#### 방법 1: Homebrew (권장)
+
+```bash
+brew tap gracelove91/tap
+brew install --cask qrfiler
+# 보안 팝업 없이 실행하려면 quarantine 제거:
+sudo xattr -cr /Applications/qrfiler.app
+```
+
+#### 방법 2: [Releases](../../releases)에서 다운로드
+
+1. `qrfiler-vX.X.X-macos-arm64.zip` 다운로드
+2. 압축 해제 후 `qrfiler.app`을 `/Applications`로 이동
+3. 터미널에서 quarantine 제거:
+   ```bash
+   xattr -cr /Applications/qrfiler.app
+   ```
+4. Launchpad 또는 Spotlight에서 실행
+
+> **왜 `xattr -cr`가 필요한가?** 이 앱은 Apple Developer ID 없이 ad-hoc 서명만 되어 있습니다. macOS는 인터넷에서 받은 서명되지 않은 앱을 기본적으로 차단합니다. 연 $99/year 개발자 계정 없이는 quarantine 속성을 제거하는 것이 팝업을 피는 유일한 방법입니다.
+
+### 소스에서 빌드
+
+```bash
+./gradlew createDistributable
+# 앱 번들: build/compose/binaries/main/app/qrfiler.app
+```
 
 ## 사용 방법
 
