@@ -2,6 +2,7 @@ package network
 
 import com.sun.net.httpserver.HttpServer
 import java.io.File
+import java.io.IOException
 import java.net.InetSocketAddress
 import java.nio.file.Files
 import java.security.SecureRandom
@@ -34,8 +35,8 @@ fun startFileServer(file: File, port: Int = 0): Pair<HttpServer, String> {
                     input.copyTo(output)
                 }
             }
-        } catch (e: Exception) {
-            exchange.sendResponseHeaders(500, -1)
+        } catch (_: IOException) {
+            // Client disconnected or file became unreadable mid-transfer
         } finally {
             exchange.close()
         }
