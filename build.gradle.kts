@@ -1,11 +1,11 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    kotlin("jvm") version "1.9.21"
-    id("org.jetbrains.compose") version "1.6.0"
+    kotlin("jvm") version "1.9.22"
+    id("org.jetbrains.compose") version "1.6.11"
 }
 
-group = "com.example"
+group = "kr.gracelove.qrfiler"
 version = "1.0.1"
 
 repositories {
@@ -16,7 +16,7 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
-    implementation("com.google.zxing:core:3.5.2")
+    implementation("com.google.zxing:core:3.5.3")
 }
 
 compose.desktop {
@@ -40,11 +40,9 @@ afterEvaluate {
     tasks.findByName("createDistributable")?.let { t ->
         t.doLast {
             val app = file("build/compose/binaries/main/app/qrfiler.app")
-            if (app.exists()) {
-                exec {
-                    commandLine("codesign", "--deep", "--force", "--verbose", "--sign", "-", app)
-                }
-                println("Signed: ${app.absolutePath}")
+            if (!app.exists()) return@doLast
+            exec {
+                commandLine("bash", file("scripts/sign-app.sh").absolutePath, app.absolutePath)
             }
         }
     }
