@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.example"
-version = "1.0.0"
+version = "1.0.1"
 
 repositories {
     google()
@@ -27,10 +27,25 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "qrfiler"
-            packageVersion = "1.0.0"
+            packageVersion = "1.0.1"
 
             macOS {
                 iconFile.set(file("src/main/resources/qrfiler.icns"))
+            }
+        }
+    }
+}
+
+// Post-build: sign the .app bundle for Gatekeeper
+afterEvaluate {
+    tasks.findByName("createDistributable")?.let { t ->
+        t.doLast {
+            val app = file("build/compose/binaries/main/app/qrfiler.app")
+            if (app.exists()) {
+                exec {
+                    commandLine("codesign", "--deep", "--force", "--verbose", "--sign", "-", app)
+                }
+                println("Signed: ${app.absolutePath}")
             }
         }
     }

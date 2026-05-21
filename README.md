@@ -11,12 +11,28 @@ Kotlin + Compose Desktop 기반 로컬 파일 공유 앱. 파일이나 폴더를
 | HTTP Server | `com.sun.net.httpserver.HttpServer` |
 | QR Code | ZXing |
 
+## macOS Gatekeeper — First Launch
+
+This app is ad-hoc signed only (no Apple Developer ID notarization). Because you downloaded it from the internet, macOS may show:
+
+> "Apple cannot check it for malicious software."
+
+**Workaround**: Right-click the app → **Open** instead of double-click.
+
+Or remove quarantine via Terminal:
+
+```bash
+xattr -dr com.apple.quarantine /path/to/qrfiler.app
+```
+
+If needed, also allow in **System Settings → Privacy & Security**.
+
 ## Development
 
 ```bash
 # Run
 ./gradlew run
 
-# Package macOS .app
-./gradlew packageDmg
+# Package macOS .app and auto-sign (adhoc)
+./gradlew createDistributable
 ```
