@@ -26,7 +26,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "qrfiler"
-            packageVersion = "1.0.1"
+            packageVersion = version.toString()
 
             macOS {
                 iconFile.set(file("src/main/resources/qrfiler.icns"))
